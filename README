@@ -1,0 +1,3 @@
+This plugin is an OSLC-CM consumer. On the occurence of a build failure, it allows automated creation of bug reports in bug trackers having OSLC support, using Oauth and REST.
+
+For more details of the OSLC protocol, see http://open-services.net/bin/view/Main/CmHome

@@ -1,0 +1,38 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler"
+	xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson"
+	xmlns:f="/lib/form">
+	
+		<f:entry title="Access Token">
+			<input class="setting-input" name="token" type="text"
+				value="${instance.token}" />
+		</f:entry>
+		<f:entry title="Access Token Secret">
+			<input class="setting-input" name="tokenSecret"
+				type="password" value="${instance.tokenSecret}" />
+		</f:entry>		
+		<f:block>
+		  <table>
+		    <f:optionalBlock name="automatic" title="Create bugs automatically on build failure" checked="${instance.automatic}">
+		      <f:entry title="Automatic Bug Creation URL">
+		        <f:textbox name="url" value="${instance.url}"/>
+		      </f:entry>
+		      <f:entry title="Send bug report on each build failure?" help="/plugin/consumer/help-build-failure.html">
+		    	<f:checkbox name="eachBuildFailure" checked="${instance.eachBuildFailure}" />
+			  </f:entry>
+			  <f:entry title="Send bug report on the first of a series of build failures?" help="/plugin/consumer/help-build-failure.html">
+		    	<f:checkbox name="firstBuildFailure" checked="${instance.firstBuildFailure}" />
+			  </f:entry>
+		    </f:optionalBlock>
+		  </table>
+		</f:block>
+		<f:block>
+		  <table>
+		    <f:optionalBlock name="manual" title="Create bugs manually" checked="${instance.manual}">
+		      <f:entry title="Delegated Bug Creation URL">
+		        <f:textbox name="delegUrl" value="${instance.delegUrl}"/>
+		      </f:entry>		      
+		    </f:optionalBlock>
+		  </table>
+		</f:block>
+	
+</j:jelly>

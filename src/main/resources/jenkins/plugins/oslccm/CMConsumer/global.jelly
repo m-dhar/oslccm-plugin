@@ -1,0 +1,14 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler"
+	xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson"
+	xmlns:f="/lib/form">
+	<f:section title="Global OSLC Consumer Settings">
+		<f:entry title="Key">
+			<input class="setting-input" name="consumerKey" type="text"
+				value="${descriptor.consumerKey}" />
+		</f:entry>
+		<f:entry title="Consumer Secret">
+			<input class="setting-input" name="consumerSecret"
+				type="password" value="${descriptor.consumerSecret}" />
+		</f:entry>		
+	</f:section>
+</j:jelly>
