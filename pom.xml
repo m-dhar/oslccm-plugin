@@ -52,42 +52,34 @@
 			<version>1.4</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.http</groupId>
-			<artifactId>httpcore</artifactId>
-			<version>4.1</version>
+	    	<groupId>org.apache.httpcomponents</groupId>
+		    <artifactId>httpcore</artifactId>
+		    <version>4.1</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.http</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.1</version>
+    		<groupId>org.apache.httpcomponents</groupId>
+    		<artifactId>httpclient</artifactId>
+    		<version>4.1</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.http</groupId>
-			<artifactId>httpclient-cache</artifactId>
-			<version>4.1</version>
+		    <groupId>org.apache.httpcomponents</groupId>
+		    <artifactId>httpclient-cache</artifactId>
+		    <version>4.1</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.http</groupId>
-			<artifactId>httpmime</artifactId>
-			<version>4.1</version>
+		    <groupId>oauth.signpost</groupId>
+		    <artifactId>signpost-core</artifactId>
+		    <version>1.2.1.1</version>
 		</dependency>
 		<dependency>
-    		<groupId>signpost</groupId>
-    		<artifactId>commonshttp4</artifactId>
-    		<version>2.1.1</version>
-    		<scope>compile</scope>
+		    <groupId>oauth.signpost</groupId>
+		    <artifactId>signpost-commonshttp4</artifactId>
+		    <version>1.2.1.1</version>
 		</dependency>
 		<dependency>
-    		<groupId>signpost</groupId>
-    		<artifactId>core</artifactId>
-    		<version>2.1.1</version>
-    		<scope>compile</scope>
-		</dependency>
-		<dependency>
-    		<groupId>org.json</groupId>
-    		<artifactId>json</artifactId>
-    		<version>0.3</version>
-    		<scope>compile</scope>
+		    <groupId>org.json</groupId>
+		    <artifactId>json</artifactId>
+		    <version>20090211</version>
 		</dependency>
 	</dependencies>
   
