@@ -1,0 +1,94 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.jenkins-ci.plugins</groupId>
+    <artifactId>plugin</artifactId>
+    <version>1.399</version><!-- which version of Jenkins is this plugin built against? -->
+  </parent>
+
+  <groupId>jenkins.plugins.oslccm</groupId>
+  <artifactId>cmconsumer</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>hpi</packaging>
+
+  <!-- get every artifact through maven.glassfish.org, which proxies all the artifacts that we need -->
+  <repositories>
+    <repository>
+      <id>m.g.o-public</id>
+      <url>http://maven.glassfish.org/content/groups/public/</url>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>m.g.o-public</id>
+      <url>http://maven.glassfish.org/content/groups/public/</url>
+    </pluginRepository>
+  </pluginRepositories>
+  
+  <name>OSLC-CM Consumer</name>
+	<description>Create automatic bug reports in remote bug trackers</description>
+	
+	<developers>
+		<developer>
+			<id>mdhar</id>
+			<name>Madhumita DHAR</name>
+		</developer>
+	</developers>
+	
+	<scm>
+		<url>https://github.com/m-dhar/oslc-cm-plugin</url>
+	</scm>
+	
+  <dependencies>
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+			<version>3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.http</groupId>
+			<artifactId>httpcore</artifactId>
+			<version>4.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.http</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.http</groupId>
+			<artifactId>httpclient-cache</artifactId>
+			<version>4.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.http</groupId>
+			<artifactId>httpmime</artifactId>
+			<version>4.1</version>
+		</dependency>
+		<dependency>
+    		<groupId>signpost</groupId>
+    		<artifactId>commonshttp4</artifactId>
+    		<version>2.1.1</version>
+    		<scope>compile</scope>
+		</dependency>
+		<dependency>
+    		<groupId>signpost</groupId>
+    		<artifactId>core</artifactId>
+    		<version>2.1.1</version>
+    		<scope>compile</scope>
+		</dependency>
+		<dependency>
+    		<groupId>org.json</groupId>
+    		<artifactId>json</artifactId>
+    		<version>0.3</version>
+    		<scope>compile</scope>
+		</dependency>
+	</dependencies>
+  
+</project>
