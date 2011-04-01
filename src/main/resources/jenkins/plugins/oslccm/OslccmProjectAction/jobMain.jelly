@@ -1,0 +1,8 @@
+<j:jelly xmlns:j="jelly:core" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  <table style="margin-top: 1em; margin-left:1em;">
+    <t:summary icon="document.gif">
+      <h2>OSLC stuff</h2>      
+          <li>dunno what to put here yet</li>        
+    </t:summary>
+  </table>
+</j:jelly>

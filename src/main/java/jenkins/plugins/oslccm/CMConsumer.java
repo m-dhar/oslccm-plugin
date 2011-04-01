@@ -23,6 +23,7 @@ import org.kohsuke.stapler.StaplerRequest;
 import hudson.Extension;
 import hudson.Functions;
 import hudson.Launcher;
+import hudson.model.Action;
 import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.model.AbstractBuild;
@@ -66,6 +67,11 @@ public class CMConsumer extends Notifier {
 	public CMConsumer(String token, String tokenSecret)	{
 		this.token = token;
 		this.tokenSecret = tokenSecret;
+	}
+	
+	@Override
+	public Action getProjectAction(AbstractProject<?, ?> project) {
+		return new OslccmProjectAction(project);
 	}
 	
 	public boolean getEachBuildFailure()	{
@@ -130,6 +136,9 @@ public class CMConsumer extends Notifier {
 		LOGGER.info("Delegated URL: " + delegUrl);
 		LOGGER.info("On every failure: " + eachBuildFailure);
 		LOGGER.info("On first failure: " + firstBuildFailure);
+		
+		OslccmBuildAction bAction = new OslccmBuildAction(build);
+		build.addAction(bAction);
 		
 		if (shouldSendBugReport(build)) {
 			try {
@@ -301,6 +310,7 @@ public class CMConsumer extends Notifier {
 				save();
 			}
 			//return super.newInstance(req, formData);
+			LOGGER.info("new Instance");
 			return new CMConsumer(	
 					req.getParameter("token"),
 					req.getParameter("tokenSecret"),
@@ -310,7 +320,9 @@ public class CMConsumer extends Notifier {
 					req.getParameter("delegUrl"),
 					req.getParameter("eachBuildFailure")!=null,
 					req.getParameter("firstBuildFailure")!=null);
-		}		
+		}	
 		
 	}
+	
+	
 }
