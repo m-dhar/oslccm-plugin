@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>OAuth</groupId>
+  <artifactId>OAuth</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  
+  <repositories>
+    <repository>
+      <id>m.g.o-public</id>
+      <url>http://maven.glassfish.org/content/groups/public/</url>
+    </repository>
+  </repositories>
+  
+  <name>OAuth</name>
+	<description>A mechanism for establishing oauth credentials</description>
+	
+	<developers>
+		<developer>
+			<id>mdhar</id>
+			<name>Madhumita DHAR</name>
+		</developer>
+	</developers>
+	
+	<scm>
+		<url>https://github.com/m-dhar/oslc-cm-plugin</url>
+	</scm>
+	
+	<dependencies>
+		<dependency>
+		    <groupId>oauth.signpost</groupId>
+		    <artifactId>signpost-core</artifactId>
+		    <version>1.2.1.1</version>
+		</dependency>
+		<dependency>
+		    <groupId>oauth.signpost</groupId>
+		    <artifactId>signpost-commonshttp4</artifactId>
+		    <version>1.2.1.1</version>
+		</dependency>
+	</dependencies>	
+  
+</project>
