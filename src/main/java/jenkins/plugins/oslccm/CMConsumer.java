@@ -1,5 +1,26 @@
-package jenkins.plugins.oslccm;
+/**
+ * This file is (c) Copyright 2011 by Madhumita DHAR, Institut TELECOM
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
+ * This program has been developed in the frame of the COCLICO
+ * project with financial support of its funders.
+ *
+ */
 
+package jenkins.plugins.oslccm;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -50,15 +71,19 @@ public class CMConsumer extends Notifier {
 	private String delegUrl;
 	private boolean eachBuildFailure;
 	private boolean firstBuildFailure;
+	private int width;
+	private int height;
 	
 	//@DataBoundConstructor
-	public CMConsumer(String token, String tokenSecret, boolean manual, boolean automatic, String url, String delegUrl, boolean eachBuildFailure, boolean firstBuildFailure)	{
+	public CMConsumer(String token, String tokenSecret, boolean manual, boolean automatic, String url, String delegUrl, int width, int height, boolean eachBuildFailure, boolean firstBuildFailure)	{
 		this.token = token;
 		this.tokenSecret = tokenSecret;
 		this.manual = manual;
 		this.automatic = automatic;
 		this.url = url;
 		this.delegUrl = delegUrl;
+		this.width = width;
+		this.height = height;
 		this.eachBuildFailure = eachBuildFailure;
 		this.firstBuildFailure = firstBuildFailure;
 	}
@@ -106,6 +131,14 @@ public class CMConsumer extends Notifier {
 		return delegUrl;
 	}
 	
+	public int getWidth()	{
+		return width;
+	}
+	
+	public int getHeight()	{
+		return height;
+	}
+	
 	private static String createTinyUrl(String url) throws IOException {
 		org.apache.commons.httpclient.HttpClient client = new org.apache.commons.httpclient.HttpClient();
 		GetMethod gm = new GetMethod("http://tinyurl.com/api-create.php?url="
@@ -134,11 +167,16 @@ public class CMConsumer extends Notifier {
 		LOGGER.info("Automatic: " + automatic);
 		LOGGER.info("URL: " + url);
 		LOGGER.info("Delegated URL: " + delegUrl);
+		LOGGER.info("Delegated URL width: " + width);
+		LOGGER.info("Delegated URL height: " + height);
 		LOGGER.info("On every failure: " + eachBuildFailure);
 		LOGGER.info("On first failure: " + firstBuildFailure);
 		
-		OslccmBuildAction bAction = new OslccmBuildAction(build);
-		build.addAction(bAction);
+		if(manual)	{
+			OslccmBuildAction bAction = new OslccmBuildAction(build, this.getDelegUrl(), this.width, this.height);
+			build.addAction(bAction);
+			LOGGER.info("Adding delegated create action");
+		}
 		
 		if (shouldSendBugReport(build)) {
 			try {
@@ -318,6 +356,8 @@ public class CMConsumer extends Notifier {
 					req.getParameter("automatic")!=null,
 					req.getParameter("url"),
 					req.getParameter("delegUrl"),
+					Integer.parseInt(req.getParameter("width")),
+					Integer.parseInt(req.getParameter("height")),
 					req.getParameter("eachBuildFailure")!=null,
 					req.getParameter("firstBuildFailure")!=null);
 		}	
