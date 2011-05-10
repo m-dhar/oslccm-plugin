@@ -23,10 +23,15 @@
 package jenkins.plugins.oslccm;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.json.JSONObject;
+import net.sf.json.JSONArray;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -54,9 +59,15 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 import hudson.tasks.Mailer;
+import hudson.util.FormValidation;
+
+import org.kohsuke.stapler.QueryParameter;
 
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
+import oauth.signpost.exception.OAuthCommunicationException;
+import oauth.signpost.exception.OAuthExpectationFailedException;
+import oauth.signpost.exception.OAuthMessageSignerException;
 
 
 public class CMConsumer extends Notifier {
@@ -73,19 +84,33 @@ public class CMConsumer extends Notifier {
 	private boolean firstBuildFailure;
 	private int width;
 	private int height;
+	private List<String> bugprops;
+	private final int HEIGHT = 600;
+	private final int WIDTH = 800;
+	private boolean defaultProps;
+	private OAuthConsumer consumer;
 	
 	//@DataBoundConstructor
-	public CMConsumer(String token, String tokenSecret, boolean manual, boolean automatic, String url, String delegUrl, int width, int height, boolean eachBuildFailure, boolean firstBuildFailure)	{
+	public CMConsumer(String token, String tokenSecret, boolean manual, boolean automatic, String url, String delegUrl, String width, String height, boolean eachBuildFailure, boolean firstBuildFailure, List<String> newprops)	{
 		this.token = token;
 		this.tokenSecret = tokenSecret;
 		this.manual = manual;
 		this.automatic = automatic;
 		this.url = url;
-		this.delegUrl = delegUrl;
-		this.width = width;
-		this.height = height;
+		this.delegUrl = delegUrl;		
+		this.width = isInteger(width, WIDTH);
+		this.height = isInteger(height, HEIGHT);
 		this.eachBuildFailure = eachBuildFailure;
 		this.firstBuildFailure = firstBuildFailure;
+		if(newprops==null)	{
+			LOGGER.info("Newprops = NULL");
+			this.defaultProps = true;
+			this.bugprops = new ArrayList<String>();
+			
+		}else	{
+			this.defaultProps = false;
+			this.bugprops = newprops;
+		}
 	}
 	
 	@DataBoundConstructor
@@ -139,6 +164,26 @@ public class CMConsumer extends Notifier {
 		return height;
 	}
 	
+	/**
+     * for config.jelly
+     */
+    public List<String> getBugprops() {
+    	if(this.defaultProps)	return null;
+    	else return Collections.unmodifiableList(bugprops);
+    }
+    
+    public void setBugprops(List<String> newprops) {
+        this.bugprops = newprops;
+    }
+	
+	private static int isInteger(String num, int n){
+		try{
+			return Integer.parseInt(num);
+		}catch(Exception e){
+			return n;
+		}
+	}
+	
 	private static String createTinyUrl(String url) throws IOException {
 		org.apache.commons.httpclient.HttpClient client = new org.apache.commons.httpclient.HttpClient();
 		GetMethod gm = new GetMethod("http://tinyurl.com/api-create.php?url="
@@ -172,8 +217,12 @@ public class CMConsumer extends Notifier {
 		LOGGER.info("On every failure: " + eachBuildFailure);
 		LOGGER.info("On first failure: " + firstBuildFailure);
 		
+		String uiUrl = this.getDelegUrl();
 		if(manual)	{
-			OslccmBuildAction bAction = new OslccmBuildAction(build, this.getDelegUrl(), this.width, this.height);
+			consumer = new CommonsHttpOAuthConsumer(((DescriptorImpl) getDescriptor()).getConsumerKey(), ((DescriptorImpl) getDescriptor()).getConsumerSecret());
+	        consumer.setTokenWithSecret(getToken(), getTokenSecret());
+			
+			OslccmBuildAction bAction = new OslccmBuildAction(build, uiUrl, this.width, this.height, consumer);
 			build.addAction(bAction);
 			LOGGER.info("Adding delegated create action");
 		}
@@ -205,33 +254,41 @@ public class CMConsumer extends Notifier {
 	public void sendReport(String message) throws Exception {
 		LOGGER.info("Attempting to send bug report: " + message);
 		
-		OAuthConsumer consumer = new CommonsHttpOAuthConsumer(((DescriptorImpl) getDescriptor()).getConsumerKey(), ((DescriptorImpl) getDescriptor()).getConsumerSecret());
+		JSONStringer js = new JSONStringer();
+        if(this.defaultProps)	{
+	    	js.object().key("dcterms:title").value("Hudson Build Failure").
+	    	    key("dcterms:description").value(message).
+	    	    key("oslc_cm:status").value("Open").
+	    	    key("helios_bt:priority").value("3").
+	    	    key("helios_bt:assigned_to").value("Nobody").endObject();
+        }
+        else	{
+        	Iterator iter = bugprops.iterator();
+        	String temp;
+        	String[] prop;
+        	js.object();
+    		while(iter.hasNext())	{
+    			temp = (String)iter.next();
+    			prop = temp.split("::");
+    			js.key(prop[0]).value(prop[1]);
+    		}
+    		js.endObject();
+        }
         
-        consumer.setTokenWithSecret(getToken(), getTokenSecret());
-        
-        /*HttpPost request = new HttpPost("http://squeeze2/plugins/oauthprovider/echo.php");
-        StringEntity body = new StringEntity("message=hello", "UTF-8"));
-        body.setContentType("application/x-www-form-urlencoded");
-        request.setEntity(body);*/
-        
-        JSONStringer js = new JSONStringer();
-    	js.object().key("dcterms:title").value("Hudson Build Failure").
-    	    key("dcterms:description").value(message).
-    	    key("oslc_cm:status").value("Open").
-    	    key("helios_bt:priority").value("3").
-    	    key("helios_bt:assigned_to").value("Nobody").endObject();
+        String jsonbug = js.toString();
+        LOGGER.info("Report: " + jsonbug);
     	
-        HttpPost request = new HttpPost(getUrl());
+        HttpPost request = new HttpPost((getUrl()));
         request.setHeader("Accept", "application/json");
         request.setHeader("Content-Type","application/json");
-        StringEntity body = new StringEntity(js.toString());
+        StringEntity body = new StringEntity(jsonbug);
         //body.setContentType("application/json;charset=UTF-8");
         //body.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE,"application/json;charset=UTF-8"));
-        request.setEntity(body);
-        
-        
+        request.setEntity(body);        
 
         consumer.sign(request);
+        LOGGER.info(request.getFirstHeader("Authorization").getValue());
+        LOGGER.info(consumer.sign(getUrl()));
 
         LOGGER.info("Sending bug report to Fusionforge...");
         
@@ -335,6 +392,40 @@ public class CMConsumer extends Notifier {
 			return hudsonUrl;
 		}
 		
+		public String VerifyJsonProperties(String property)	{
+			property = property.trim();
+			if(property.length()==0)	{
+				return "Nothing specified";
+			}
+			else if(!property.matches("[^\"\']+"))	{
+				return "Quotes are not allowed";
+			}
+			else if((property.indexOf("::")<0)){
+				return "The '::' operator must be present";
+			}
+			else if((property.indexOf("::")==0)){
+				return "The property cant be empty";
+			}
+			else if(property.indexOf("::")!=property.lastIndexOf("::"))	{
+				return "The '::' operator must be present only once";
+			}
+			else if((property.indexOf("::")>(property.length()-3))){
+				return "The value cant be empty";
+			}
+			else	{				
+				return null;				
+			}
+		}
+		
+		public FormValidation doCheckProp(@QueryParameter String prop) {
+			String result = VerifyJsonProperties(prop);
+			if(result==null)	{
+				return FormValidation.ok();
+			}else	{
+				return FormValidation.error(result);
+			}
+		}
+		
 		@Override
 		public boolean isApplicable(Class<? extends AbstractProject> jobType) {
 			return true;
@@ -347,6 +438,35 @@ public class CMConsumer extends Notifier {
 				hudsonUrl = Functions.inferHudsonURL(req);
 				save();
 			}
+			JSONObject auto = formData.getJSONObject("automatic");
+			LOGGER.info(auto.toString());
+			List<String> newProps = null;
+			if(auto.has("bugprops"))	{
+				Object properties = auto.get("bugprops");
+				newProps = new ArrayList<String>();
+				//LOGGER.info(properties.toString());
+				if(properties instanceof JSONObject)	{
+					String property = (String)((JSONObject) properties).get("prop");
+					String result = this.VerifyJsonProperties(property);
+					if(result==null)	{
+						newProps.add(property);
+					}
+				}else if(properties instanceof JSONArray)	{
+					Iterator<JSONObject> i = ((JSONArray) properties).iterator();					
+					while(i.hasNext())	{
+						String property = i.next().getString("prop");
+						String result = this.VerifyJsonProperties(property);
+						if(result==null)	{
+							newProps.add(property);
+							LOGGER.info(property);
+						}
+					}
+				}
+			}
+			if((newProps!=null)&&(newProps.isEmpty()))	{
+				newProps = null;
+			}
+			
 			//return super.newInstance(req, formData);
 			LOGGER.info("new Instance");
 			return new CMConsumer(	
@@ -356,10 +476,11 @@ public class CMConsumer extends Notifier {
 					req.getParameter("automatic")!=null,
 					req.getParameter("url"),
 					req.getParameter("delegUrl"),
-					Integer.parseInt(req.getParameter("width")),
-					Integer.parseInt(req.getParameter("height")),
+					req.getParameter("width"),
+					req.getParameter("height"),
 					req.getParameter("eachBuildFailure")!=null,
-					req.getParameter("firstBuildFailure")!=null);
+					req.getParameter("firstBuildFailure")!=null,
+					newProps);
 		}	
 		
 	}

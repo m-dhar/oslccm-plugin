@@ -37,11 +37,27 @@
 		      <f:entry title="Automatic Bug Creation URL">
 		        <f:textbox name="url" value="${instance.url}"/>
 		      </f:entry>
-		      <f:entry title="Send bug report on each build failure?" help="/plugin/consumer/help-build-failure.html">
+		      <f:entry title="Send bug report on each build failure?">
 		    	<f:checkbox name="eachBuildFailure" checked="${instance.eachBuildFailure}" />
 			  </f:entry>
-			  <f:entry title="Send bug report on the first of a series of build failures?" help="/plugin/consumer/help-build-failure.html">
+			  <f:entry title="or on the 1st of a series of failures?">
 		    	<f:checkbox name="firstBuildFailure" checked="${instance.firstBuildFailure}" />
+			  </f:entry> 
+			  <f:entry title="Json content for bug report" description="for more details, click on help (the '?' sign)" help="/plugin/oslccm/help-json-report.html">
+			  
+			  	<f:repeatable name="bugprops" var="prop" items="${instance.bugprops}">
+			      <table width="100%">
+			      	<f:entry title="name::value" description="e.g. dc:title::Hudson Build Failure">
+			        	<f:textbox name="prop" value="${prop}" 
+			        				checkUrl="'descriptorByName/CMConsumer/checkProp?prop='+encodeURIComponent(this.value)"/>
+			        </f:entry>
+			        <f:entry title="">
+			          <div align="right">
+			            <f:repeatableDeleteButton />
+			          </div>
+			        </f:entry>
+			      </table>
+			    </f:repeatable>
 			  </f:entry>
 		    </f:optionalBlock>
 		  </table>

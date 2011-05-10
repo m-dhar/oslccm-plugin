@@ -23,13 +23,13 @@
   <l:layout>
   <st:include it="${it.build}" page="sidepanel.jelly"/>
     <l:main-panel>
-      <!--h2>Delegated Bug Report</h2-->  
+      <!--h2>Delegated Bug Report</h2-->
       <h2>${it.displayName}</h2>
       <block>
-      <iframe src="${it.url}" width="${it.width}" height="${it.height}" frameborder="0">
-  			<p>Your browser does not support iframes.</p>
+      	<iframe src="${it.url}" width="${it.width}" height="${it.height}" frameborder="0">
+   		<p>Your browser does not support iframes.</p>
 		</iframe>
-      </block>                      
+      </block>
     </l:main-panel>
   </l:layout>
 </j:jelly>
