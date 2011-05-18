@@ -1,3 +1,24 @@
+<!--
+	This file is (c) Copyright 2011 by Madhumita DHAR, Institut TELECOM
+	
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+	
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+	
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+	
+	This program has been developed in the frame of the COCLICO
+	project with financial support of its funders.
+-->
+
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler"
 	xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson"
 	xmlns:f="/lib/form">
@@ -16,11 +37,27 @@
 		      <f:entry title="Automatic Bug Creation URL">
 		        <f:textbox name="url" value="${instance.url}"/>
 		      </f:entry>
-		      <f:entry title="Send bug report on each build failure?" help="/plugin/consumer/help-build-failure.html">
+		      <f:entry title="Send bug report on each build failure?">
 		    	<f:checkbox name="eachBuildFailure" checked="${instance.eachBuildFailure}" />
 			  </f:entry>
-			  <f:entry title="Send bug report on the first of a series of build failures?" help="/plugin/consumer/help-build-failure.html">
+			  <f:entry title="or on the 1st of a series of failures?">
 		    	<f:checkbox name="firstBuildFailure" checked="${instance.firstBuildFailure}" />
+			  </f:entry> 
+			  <f:entry title="Json content for bug report" description="for more details, click on help (the '?' sign)" help="/plugin/oslccm/help-json-report.html">
+			  
+			  	<f:repeatable name="bugprops" var="prop" items="${instance.bugprops}">
+			      <table width="100%">
+			      	<f:entry title="name::value" description="e.g. dc:title::Hudson Build Failure">
+			        	<f:textbox name="prop" value="${prop}" 
+			        				checkUrl="'descriptorByName/CMConsumer/checkProp?prop='+encodeURIComponent(this.value)"/>
+			        </f:entry>
+			        <f:entry title="">
+			          <div align="right">
+			            <f:repeatableDeleteButton />
+			          </div>
+			        </f:entry>
+			      </table>
+			    </f:repeatable>
 			  </f:entry>
 		    </f:optionalBlock>
 		  </table>
@@ -30,6 +67,12 @@
 		    <f:optionalBlock name="manual" title="Create bugs manually" checked="${instance.manual}">
 		      <f:entry title="Delegated Bug Creation URL">
 		        <f:textbox name="delegUrl" value="${instance.delegUrl}"/>
+		      </f:entry>
+		      <f:entry title="Delegated Creation Window Width">
+		        <f:textbox name="width" value="${instance.width}"/>
+		      </f:entry>
+		      <f:entry title="Delegated Creation Window Height">
+		        <f:textbox name="height" value="${instance.height}"/>
 		      </f:entry>		      
 		    </f:optionalBlock>
 		  </table>
